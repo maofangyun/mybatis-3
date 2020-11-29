@@ -96,6 +96,7 @@ public class XMLConfigBuilder extends BaseBuilder {
       throw new BuilderException("Each XMLConfigBuilder can only be used once.");
     }
     parsed = true;
+    // 从根节点<configuration/>开始解析
     parseConfiguration(parser.evalNode("/configuration"));
     return configuration;
   }
@@ -103,20 +104,32 @@ public class XMLConfigBuilder extends BaseBuilder {
   private void parseConfiguration(XNode root) {
     try {
       // issue #117 read properties first
+      // 解析<properties/>节点
       propertiesElement(root.evalNode("properties"));
+      // 解析<settings/>节点
       Properties settings = settingsAsProperties(root.evalNode("settings"));
       loadCustomVfs(settings);
       loadCustomLogImpl(settings);
+      // 解析<typeAliases/>节点
       typeAliasesElement(root.evalNode("typeAliases"));
+      // 解析<plugins/>节点
       pluginElement(root.evalNode("plugins"));
+      // 解析<objectFactory/>节点
       objectFactoryElement(root.evalNode("objectFactory"));
+      // 解析<objectWrapperFactory/>节点
       objectWrapperFactoryElement(root.evalNode("objectWrapperFactory"));
+      // 解析<reflectorFactory/>节点
       reflectorFactoryElement(root.evalNode("reflectorFactory"));
+      // 将settings填充到configuration
       settingsElement(settings);
       // read it after objectFactory and objectWrapperFactory issue #631
+      // 解析<environments/>节点
       environmentsElement(root.evalNode("environments"));
+      // 解析<databaseIdProvider/>节点
       databaseIdProviderElement(root.evalNode("databaseIdProvider"));
+      // 解析<typeHandlers/>节点
       typeHandlerElement(root.evalNode("typeHandlers"));
+      // 解析<mappers/>节点(重点)
       mapperElement(root.evalNode("mappers"));
     } catch (Exception e) {
       throw new BuilderException("Error parsing SQL Mapper Configuration. Cause: " + e, e);
@@ -363,10 +376,21 @@ public class XMLConfigBuilder extends BaseBuilder {
   private void mapperElement(XNode parent) throws Exception {
     if (parent != null) {
       for (XNode child : parent.getChildren()) {
+        //   <mappers/>
+        //    <package name="com.abc.test.mapper"/>
+        //  </mappers>
         if ("package".equals(child.getName())) {
+          // 获取指定的包名
           String mapperPackage = child.getStringAttribute("name");
+          // 将mapperPackage下面的mapper接口和相应的工厂类添加到mapperRegistry.knownMappers
           configuration.addMappers(mapperPackage);
         } else {
+          // <mapper/>节点的resource、url或class属性这三个属性互斥
+          //   <mappers>
+          //    <mapper resource="xxx.xml"/>(常用)
+          //    <mapper url="xxx.com"/>
+          //    <mapper class="xxx.class"/>
+          //  </mappers>
           String resource = child.getStringAttribute("resource");
           String url = child.getStringAttribute("url");
           String mapperClass = child.getStringAttribute("class");

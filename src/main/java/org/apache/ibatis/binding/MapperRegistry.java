@@ -34,6 +34,7 @@ import org.apache.ibatis.session.SqlSession;
 public class MapperRegistry {
 
   private final Configuration config;
+  // key=映射的Mapper接口全限定名称,value=对应的代理工厂
   private final Map<Class<?>, MapperProxyFactory<?>> knownMappers = new HashMap<>();
 
   public MapperRegistry(Configuration config) {
@@ -47,6 +48,7 @@ public class MapperRegistry {
       throw new BindingException("Type " + type + " is not known to the MapperRegistry.");
     }
     try {
+      // jdk的动态代理,生成Mapper接口的代理类
       return mapperProxyFactory.newInstance(sqlSession);
     } catch (Exception e) {
       throw new BindingException("Error getting mapper instance. Cause: " + e, e);
@@ -68,7 +70,9 @@ public class MapperRegistry {
         // It's important that the type is added before the parser is run
         // otherwise the binding may automatically be attempted by the
         // mapper parser. If the type is already known, it won't try.
+        // 解析接口上的注解信息，并添加至configuration对象
         MapperAnnotationBuilder parser = new MapperAnnotationBuilder(config, type);
+        // 解析处理mapper接口对应的xml文件
         parser.parse();
         loadCompleted = true;
       } finally {
@@ -100,9 +104,12 @@ public class MapperRegistry {
    */
   public void addMappers(String packageName, Class<?> superType) {
     ResolverUtil<Class<?>> resolverUtil = new ResolverUtil<>();
+    // 获取packageName目录下所有的类全限定名称,缓存在matches中
     resolverUtil.find(new ResolverUtil.IsA(superType), packageName);
+    // mapperSet即matches
     Set<Class<? extends Class<?>>> mapperSet = resolverUtil.getClasses();
     for (Class<?> mapperClass : mapperSet) {
+      // 筛选得到Mapper接口,将mapperClass和相应的MapperProxyFactory缓存到Map<Class<?>, MapperProxyFactory<?>> knownMappers
       addMapper(mapperClass);
     }
   }

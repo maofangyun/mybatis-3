@@ -91,14 +91,21 @@ public class XMLMapperBuilder extends BaseBuilder {
   }
 
   public void parse() {
+    // 判断是否已经加载该配置文件
     if (!configuration.isResourceLoaded(resource)) {
+      // 处理<mapper/>节点
       configurationElement(parser.evalNode("/mapper"));
+      // 将mapper文件添加到configuration.loadedResources中
       configuration.addLoadedResource(resource);
+      // 注册mapper接口
       bindMapperForNamespace();
     }
 
+    //处理解析失败的<resultMap/>节点
     parsePendingResultMaps();
+    //处理解析失败的<cacheRef/>节点
     parsePendingCacheRefs();
+    //处理解析失败的sql语句的节点(例如<select/>,<insert/>,<update/>,<delete/>)
     parsePendingStatements();
   }
 
@@ -115,9 +122,13 @@ public class XMLMapperBuilder extends BaseBuilder {
       builderAssistant.setCurrentNamespace(namespace);
       cacheRefElement(context.evalNode("cache-ref"));
       cacheElement(context.evalNode("cache"));
+      // 解析处理<parameterMap/>节点
       parameterMapElement(context.evalNodes("/mapper/parameterMap"));
+      // 解析处理<resultMap/>节点
       resultMapElements(context.evalNodes("/mapper/resultMap"));
+      // 解析处理<sql/>节点
       sqlElement(context.evalNodes("/mapper/sql"));
+      // 解析处理<select/>,<insert/>,<update/>,<delete/>节点
       buildStatementFromContext(context.evalNodes("select|insert|update|delete"));
     } catch (Exception e) {
       throw new BuilderException("Error parsing Mapper XML. The XML location is '" + resource + "'. Cause: " + e, e);
@@ -131,10 +142,13 @@ public class XMLMapperBuilder extends BaseBuilder {
     buildStatementFromContext(list, null);
   }
 
+  // 解析处理所有的sql语句节点并注册至configuration对象的mappedStatements属性
   private void buildStatementFromContext(List<XNode> list, String requiredDatabaseId) {
     for (XNode context : list) {
+      // 创建XMLStatementBuilder,专门用于解析sql语句节点
       final XMLStatementBuilder statementParser = new XMLStatementBuilder(configuration, builderAssistant, context, requiredDatabaseId);
       try {
+        // 解析sql语句节点
         statementParser.parseStatementNode();
       } catch (IncompleteElementException e) {
         configuration.addIncompleteStatement(statementParser);
@@ -240,9 +254,12 @@ public class XMLMapperBuilder extends BaseBuilder {
     }
   }
 
+  // 解析<resultMap/>节点,实际就是解析sql查询的字段与pojo属性之间的转化规则
   private void resultMapElements(List<XNode> list) {
+    // 遍历所有的<resultmap/>节点
     for (XNode resultMapNode : list) {
       try {
+        // 解析具体某一个<resultMap/>节点,实例化resultMap,并注册到configuration.resultMaps中
         resultMapElement(resultMapNode);
       } catch (IncompleteElementException e) {
         // ignore, it will be retried
@@ -256,36 +273,48 @@ public class XMLMapperBuilder extends BaseBuilder {
 
   private ResultMap resultMapElement(XNode resultMapNode, List<ResultMapping> additionalResultMappings, Class<?> enclosingType) {
     ErrorContext.instance().activity("processing " + resultMapNode.getValueBasedIdentifier());
+    // 获取<resultMap/>节点,type属性的value(即pojo的名称)
     String type = resultMapNode.getStringAttribute("type",
         resultMapNode.getStringAttribute("ofType",
             resultMapNode.getStringAttribute("resultType",
                 resultMapNode.getStringAttribute("javaType"))));
+    // 通过type别名查询全限定名称,返回type的Class对象
     Class<?> typeClass = resolveClass(type);
     if (typeClass == null) {
       typeClass = inheritEnclosingType(resultMapNode, enclosingType);
     }
     Discriminator discriminator = null;
     List<ResultMapping> resultMappings = new ArrayList<>(additionalResultMappings);
+    // 获取当前<resultmap/>中的所有子节点,并开始遍历
     List<XNode> resultChildren = resultMapNode.getChildren();
     for (XNode resultChild : resultChildren) {
+      // 处理<constructor/>节点
       if ("constructor".equals(resultChild.getName())) {
         processConstructorElement(resultChild, typeClass, resultMappings);
       } else if ("discriminator".equals(resultChild.getName())) {
+        // 处理<discriminator/>节点
         discriminator = processDiscriminatorElement(resultChild, typeClass, resultMappings);
       } else {
+        //处理<id/>,<result/>,<association/>,<collection/>节点
         List<ResultFlag> flags = new ArrayList<>();
         if ("id".equals(resultChild.getName())) {
+          // 如果是<id/>节点，向flags中添加元素
           flags.add(ResultFlag.ID);
         }
+        // 创建ResultMapping对象(封装了<id/>,<result/>,<association/>,<collection/>节点的属性信息),并加入resultMappings集合中
         resultMappings.add(buildResultMappingFromContext(resultChild, typeClass, flags));
       }
     }
+    // 获取<resultMap/>节点id属性的value
     String id = resultMapNode.getStringAttribute("id",
             resultMapNode.getValueBasedIdentifier());
+    // 获取<resultMap/>节点extends属性的value
     String extend = resultMapNode.getStringAttribute("extends");
+    // 获取<resultMap/>节点autoMapping属性的value
     Boolean autoMapping = resultMapNode.getBooleanAttribute("autoMapping");
     ResultMapResolver resultMapResolver = new ResultMapResolver(builderAssistant, id, typeClass, extend, discriminator, resultMappings, autoMapping);
     try {
+      // 实例化resultMap,并注册到configuration.resultMaps中
       return resultMapResolver.resolve();
     } catch (IncompleteElementException e) {
       configuration.addIncompleteResultMap(resultMapResolver);
@@ -368,6 +397,7 @@ public class XMLMapperBuilder extends BaseBuilder {
     return context.getStringAttribute("databaseId") == null;
   }
 
+  // 根据<resultMap/>中的子节点信息，创建resultMapping对象
   private ResultMapping buildResultMappingFromContext(XNode context, Class<?> resultType, List<ResultFlag> flags) {
     String property;
     if (flags.contains(ResultFlag.CONSTRUCTOR)) {
@@ -390,6 +420,7 @@ public class XMLMapperBuilder extends BaseBuilder {
     Class<?> javaTypeClass = resolveClass(javaType);
     Class<? extends TypeHandler<?>> typeHandlerClass = resolveClass(typeHandler);
     JdbcType jdbcTypeEnum = resolveJdbcType(jdbcType);
+    // 使用建造者模式创建resultMapping对象
     return builderAssistant.buildResultMapping(resultType, property, column, javaTypeClass, jdbcTypeEnum, nestedSelect, nestedResultMap, notNullColumn, columnPrefix, typeHandlerClass, flags, resultSet, foreignColumn, lazy);
   }
 

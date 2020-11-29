@@ -173,6 +173,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
         .build();
   }
 
+  // 实例化resultMap并将其注册到configuration对象
   public ResultMap addResultMap(
       String id,
       Class<?> type,
@@ -180,9 +181,11 @@ public class MapperBuilderAssistant extends BaseBuilder {
       Discriminator discriminator,
       List<ResultMapping> resultMappings,
       Boolean autoMapping) {
+    // 完善id,完整格式是"namespace.id"
     id = applyCurrentNamespace(id, false);
+    // 获取父类resultMap的完整id,没有父类(extends属性),返回null
     extend = applyCurrentNamespace(extend, true);
-
+    // 针对extends属性的处理
     if (extend != null) {
       if (!configuration.hasResultMap(extend)) {
         throw new IncompleteElementException("Could not find a parent resultmap with id '" + extend + "'");
@@ -201,8 +204,10 @@ public class MapperBuilderAssistant extends BaseBuilder {
       if (declaresConstructor) {
         extendedResultMappings.removeIf(resultMapping -> resultMapping.getFlags().contains(ResultFlag.CONSTRUCTOR));
       }
+      // 将原本的resultMapping对象与继承的resultMapping对象结合
       resultMappings.addAll(extendedResultMappings);
     }
+    // 通过建造者模式实例化resultMap,并注册到configuration.resultMaps中
     ResultMap resultMap = new ResultMap.Builder(configuration, id, type, resultMappings, autoMapping)
         .discriminator(discriminator)
         .build();
@@ -269,7 +274,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
 
     id = applyCurrentNamespace(id, false);
     boolean isSelect = sqlCommandType == SqlCommandType.SELECT;
-
+    // 使用建造者模式创建一个MappedStatement.Builder
     MappedStatement.Builder statementBuilder = new MappedStatement.Builder(configuration, id, sqlSource, sqlCommandType)
         .resource(resource)
         .fetchSize(fetchSize)
@@ -292,8 +297,9 @@ public class MapperBuilderAssistant extends BaseBuilder {
     if (statementParameterMap != null) {
       statementBuilder.parameterMap(statementParameterMap);
     }
-
+    // 使用建造者模式创建一个MappedStatment(封装了一个sql语句节点的所有信息)
     MappedStatement statement = statementBuilder.build();
+    // 将mappedStatment注册到configuration.mappedStatements
     configuration.addMappedStatement(statement);
     return statement;
   }
@@ -363,6 +369,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
       String statementId) {
     parameterMapName = applyCurrentNamespace(parameterMapName, true);
     ParameterMap parameterMap = null;
+    // 当sql语句节点有parameterMap属性时,按下面的逻辑处理
     if (parameterMapName != null) {
       try {
         parameterMap = configuration.getParameterMap(parameterMapName);
@@ -370,6 +377,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
         throw new IncompleteElementException("Could not find parameter map " + parameterMapName, e);
       }
     } else if (parameterTypeClass != null) {
+      // 当sql语句节点有parameterType属性时,按下面的逻辑处理
       List<ParameterMapping> parameterMappings = new ArrayList<>();
       parameterMap = new ParameterMap.Builder(
           configuration,

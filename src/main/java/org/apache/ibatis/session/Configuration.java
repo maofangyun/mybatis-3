@@ -842,6 +842,7 @@ public class Configuration {
   }
 
   public <T> T getMapper(Class<T> type, SqlSession sqlSession) {
+    // 解析mapper的xml文件,mapperRegistry存储处理的信息
     return mapperRegistry.getMapper(type, sqlSession);
   }
 
