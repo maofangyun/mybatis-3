@@ -196,6 +196,7 @@ public abstract class BaseExecutor implements Executor {
     if (closed) {
       throw new ExecutorException("Executor was closed.");
     }
+    // 缓存key,包含了方法名称+返回类型+入参类型+分页参数+sql语句
     CacheKey cacheKey = new CacheKey();
     cacheKey.update(ms.getId());
     cacheKey.update(rowBounds.getOffset());
@@ -334,8 +335,10 @@ public abstract class BaseExecutor implements Executor {
   }
 
   protected Connection getConnection(Log statementLog) throws SQLException {
+    // 从事物管理器获取数据库的连接对象
     Connection connection = transaction.getConnection();
     if (statementLog.isDebugEnabled()) {
+      // 返回带logger日志功能的连接对象的动态代理对象
       return ConnectionLogger.newInstance(connection, statementLog, queryStack);
     } else {
       return connection;

@@ -676,6 +676,7 @@ public class Configuration {
       executor = new SimpleExecutor(this, transaction);
     }
     if (cacheEnabled) {
+      // 装饰者模式,完成不同功能的封装
       executor = new CachingExecutor(executor);
     }
     executor = (Executor) interceptorChain.pluginAll(executor);
@@ -842,7 +843,7 @@ public class Configuration {
   }
 
   public <T> T getMapper(Class<T> type, SqlSession sqlSession) {
-    // 解析mapper的xml文件,mapperRegistry存储处理的信息
+    // 解析mapper.xml文件,mapperRegistry存储处理的信息
     return mapperRegistry.getMapper(type, sqlSession);
   }
 

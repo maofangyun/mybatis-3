@@ -47,6 +47,7 @@ public final class PreparedStatementLogger extends BaseJdbcLogger implements Inv
       if (Object.class.equals(method.getDeclaringClass())) {
         return method.invoke(this, params);
       }
+      // 打印记录入参信息
       if (EXECUTE_METHODS.contains(method.getName())) {
         if (isDebugEnabled()) {
           debug("Parameters: " + getParameterValueString(), true);

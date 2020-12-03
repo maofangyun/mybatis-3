@@ -64,6 +64,7 @@ public abstract class BaseJdbcLogger {
   }
 
   static {
+    // 写的很好,通过反射获取method的名称,不用在代码中固定
     SET_METHODS = Arrays.stream(PreparedStatement.class.getDeclaredMethods())
             .filter(method -> method.getName().startsWith("set"))
             .filter(method -> method.getParameterCount() > 1)
