@@ -58,8 +58,12 @@ public class SimpleExecutor extends BaseExecutor {
     Statement stmt = null;
     try {
       Configuration configuration = ms.getConfiguration();
+      // StatementHandler(生成Statement对象)持有parameterHanlder(设置sql预编译语句的入参数值)和resultSetHandler(对返回的结果集进行封装,转换成对应的实体类型),
+      // 同时还持有了boundSql,executor和mappedStatement,包含了所有sql语句执行需要的信息
       StatementHandler handler = configuration.newStatementHandler(wrapper, ms, parameter, rowBounds, resultHandler, boundSql);
+      // 得到已经完成参数值替换的Statement代理对象
       stmt = prepareStatement(handler, ms.getStatementLog());
+      // 通过statementHandler对象调用ResultSetHandler将结果集转化为指定实体对象返回
       return handler.query(stmt, resultHandler);
     } finally {
       closeStatement(stmt);
@@ -83,9 +87,11 @@ public class SimpleExecutor extends BaseExecutor {
 
   private Statement prepareStatement(StatementHandler handler, Log statementLog) throws SQLException {
     Statement stmt;
+    // 通过事务对象,从连接池中获取连接对象(带log记录功能的增强代理对象)
     Connection connection = getConnection(statementLog);
+    // 返回带有log记录功能增强的Statement代理对象,利用connection创建（prepare）Statement
     stmt = handler.prepare(connection, transaction.getTimeout());
-    // 解析处理入参类型
+    // 使用parameterHandler解析处理入参类型
     handler.parameterize(stmt);
     return stmt;
   }

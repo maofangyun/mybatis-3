@@ -93,7 +93,7 @@ public class DefaultSqlSessionFactory implements SqlSessionFactory {
       // 解析mybatis-config.xml的时候,会创建出来并加入configuration
       final Environment environment = configuration.getEnvironment();
       final TransactionFactory transactionFactory = getTransactionFactoryFromEnvironment(environment);
-      // 获取事物对象(JdbcTransaction)
+      // 获取事物对象(JdbcTransaction,包含了数据源对象(一般为数据库连接池)和连接对象)
       tx = transactionFactory.newTransaction(environment.getDataSource(), level, autoCommit);
       // 获取执行器(是MyBatis调度的核心,负责SQL语句的生成以及查询缓存的维护)
       final Executor executor = configuration.newExecutor(tx, execType);

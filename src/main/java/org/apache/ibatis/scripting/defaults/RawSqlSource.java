@@ -43,6 +43,7 @@ public class RawSqlSource implements SqlSource {
   public RawSqlSource(Configuration configuration, String sql, Class<?> parameterType) {
     SqlSourceBuilder sqlSourceParser = new SqlSourceBuilder(configuration);
     Class<?> clazz = parameterType == null ? Object.class : parameterType;
+    // 解析sql(替换占位符)和入参(生成参数封装对象ParameterMapping放进sqlSource)
     sqlSource = sqlSourceParser.parse(sql, clazz, new HashMap<>());
   }
 

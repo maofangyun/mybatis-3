@@ -1,10 +1,11 @@
 package com.abc.test.mapper;
 
 import com.abc.test.Role;
+import org.apache.ibatis.annotations.Param;
 
 public interface RoleMapper {
 
-  Role getRole(Long id);
+  Role getRole(@Param("id") Long id);
 
   Role findRole(String roleName);
 

@@ -48,7 +48,7 @@ public class MapperRegistry {
       throw new BindingException("Type " + type + " is not known to the MapperRegistry.");
     }
     try {
-      // jdk的动态代理,生成Mapper接口的代理类
+      // jdk的动态代理,生成Mapper接口的代理类,h属性中持有的对象是MapperProxy(内部有sqlSession的引用)
       return mapperProxyFactory.newInstance(sqlSession);
     } catch (Exception e) {
       throw new BindingException("Error getting mapper instance. Cause: " + e, e);

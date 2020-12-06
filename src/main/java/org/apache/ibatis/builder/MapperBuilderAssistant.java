@@ -50,6 +50,7 @@ import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 
 /**
+ * 负责实例化ParameterMapping,ResultMap,MappedStatement等参数非常多的封装对象
  * @author Clinton Begin
  */
 public class MapperBuilderAssistant extends BaseBuilder {
@@ -185,7 +186,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
     id = applyCurrentNamespace(id, false);
     // 获取父类resultMap的完整id,没有父类(extends属性),返回null
     extend = applyCurrentNamespace(extend, true);
-    // 针对extends属性的处理
+    // 针对extends属性的处理(父子resultMap的信息合并处理)
     if (extend != null) {
       if (!configuration.hasResultMap(extend)) {
         throw new IncompleteElementException("Could not find a parent resultmap with id '" + extend + "'");
@@ -211,6 +212,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
     ResultMap resultMap = new ResultMap.Builder(configuration, id, type, resultMappings, autoMapping)
         .discriminator(discriminator)
         .build();
+    // 将resultMap添加到configuration对象的属性resultMaps中
     configuration.addResultMap(resultMap);
     return resultMap;
   }

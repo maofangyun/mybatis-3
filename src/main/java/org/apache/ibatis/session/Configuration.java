@@ -672,7 +672,7 @@ public class Configuration {
       executor = new BatchExecutor(this, transaction);
     } else if (ExecutorType.REUSE == executorType) {
       executor = new ReuseExecutor(this, transaction);
-    } else {
+    } else {  // 最常用
       executor = new SimpleExecutor(this, transaction);
     }
     if (cacheEnabled) {

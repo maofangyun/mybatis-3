@@ -116,12 +116,13 @@ public class MapperAnnotationBuilder {
     String resource = type.toString();
     // 判断resource对应的xml资源是否已经加载过
     if (!configuration.isResourceLoaded(resource)) {
-      // 解析处理mapper.xml文件,并将解析出来的信息注册到configuration中
+      // 解析处理mapper.xml文件,并将解析出来的信息注册到configuration中(重点)
       loadXmlResource();
       configuration.addLoadedResource(resource);
       assistant.setCurrentNamespace(type.getName());
       parseCache();
       parseCacheRef();
+      // 处理注解方式的sql语句
       for (Method method : type.getMethods()) {
         if (!canHaveStatement(method)) {
           continue;
@@ -177,6 +178,7 @@ public class MapperAnnotationBuilder {
         }
       }
       if (inputStream != null) {
+        // XMLMapperBuilder的功能:解析mapper.xml文件
         XMLMapperBuilder xmlParser = new XMLMapperBuilder(inputStream, assistant.getConfiguration(), xmlResource, configuration.getSqlFragments(), type.getName());
         // 解析mapper接口对应的xml文件
         xmlParser.parse();

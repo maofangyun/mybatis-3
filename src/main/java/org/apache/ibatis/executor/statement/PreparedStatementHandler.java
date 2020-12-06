@@ -62,6 +62,7 @@ public class PreparedStatementHandler extends BaseStatementHandler {
   public <E> List<E> query(Statement statement, ResultHandler resultHandler) throws SQLException {
     PreparedStatement ps = (PreparedStatement) statement;
     ps.execute();
+    // 处理返回值,返回对应的实体类型
     return resultSetHandler.handleResultSets(ps);
   }
 

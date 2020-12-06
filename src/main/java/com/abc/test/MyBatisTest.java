@@ -23,6 +23,7 @@ public class MyBatisTest {
     sqlSessionFactory=new SqlSessionFactoryBuilder().build(inputStream);
     SqlSession sqlSession=null;
     try {
+      // sqlSession中包含了Executor(持有Configuration对象和Transaction对象)
       sqlSession=sqlSessionFactory.openSession();
       RoleMapper roleMapper=sqlSession.getMapper(RoleMapper.class);
       Role role=roleMapper.getRole(1L);

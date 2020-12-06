@@ -143,6 +143,7 @@ public class DefaultSqlSession implements SqlSession {
   @Override
   public <E> List<E> selectList(String statement, Object parameter, RowBounds rowBounds) {
     try {
+      // 通过二维坐标(com.abc.test.mapper.RoleMapper.getRole),从configuration中获取MappedStatement(封装了sql语句节点的所有信息)
       MappedStatement ms = configuration.getMappedStatement(statement);
       return executor.query(ms, wrapCollection(parameter), rowBounds, Executor.NO_RESULT_HANDLER);
     } catch (Exception e) {
