@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2019 the original author or authors.
+ *    Copyright 2009-2020 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -71,8 +71,9 @@ public final class PreparedStatementLogger extends BaseJdbcLogger implements Inv
           setColumn(params[0], params[1]);
         }
         return method.invoke(statement, params);
-      } else if ("getResultSet".equals(method.getName())) { // 返回动态代理增强的具有日志记录功能的resultSet
+      } else if ("getResultSet".equals(method.getName())) {
         ResultSet rs = (ResultSet) method.invoke(statement, params);
+        // 返回动态代理增强的具有日志记录功能的resultSet
         return rs == null ? null : ResultSetLogger.newInstance(rs, statementLog, queryStack);
       } else if ("getUpdateCount".equals(method.getName())) {
         int updateCount = (Integer) method.invoke(statement, params);

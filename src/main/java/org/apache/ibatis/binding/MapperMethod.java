@@ -85,6 +85,7 @@ public class MapperMethod {
         } else {  // 处理返回为单一对象的情况
           // 通过参数解析器解析参数,将入参转化成Map
           Object param = method.convertArgsToSqlCommandParam(args);
+          // 使用sqlSession执行sql语句
           result = sqlSession.selectOne(command.getName(), param);
           if (method.returnsOptional()
               && (result == null || !method.getReturnType().equals(result.getClass()))) {

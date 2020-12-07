@@ -129,6 +129,7 @@ public class ParamNameResolver {
     } else {
       final Map<String, Object> param = new ParamMap<>();
       int i = 0;
+      // names:key=入参的自然顺序, value=@Param注解中获取的入参名称
       for (Map.Entry<Integer, String> entry : names.entrySet()) {
         param.put(entry.getValue(), args[entry.getKey()]);
         // add generic param names (param1, param2, ...)

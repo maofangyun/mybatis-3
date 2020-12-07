@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2019 the original author or authors.
+ *    Copyright 2009-2020 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ public class SimpleExecutor extends BaseExecutor {
       // StatementHandler(生成Statement对象)持有parameterHanlder(设置sql预编译语句的入参数值)和resultSetHandler(对返回的结果集进行封装,转换成对应的实体类型),
       // 同时还持有了boundSql,executor和mappedStatement,包含了所有sql语句执行需要的信息
       StatementHandler handler = configuration.newStatementHandler(wrapper, ms, parameter, rowBounds, resultHandler, boundSql);
-      // 得到已经完成参数值替换的Statement代理对象
+      // 得到已经完成参数值替换的Statement代理对象,通过connection对象生成Statement预编译对象
       stmt = prepareStatement(handler, ms.getStatementLog());
       // 通过statementHandler对象调用ResultSetHandler将结果集转化为指定实体对象返回
       return handler.query(stmt, resultHandler);
