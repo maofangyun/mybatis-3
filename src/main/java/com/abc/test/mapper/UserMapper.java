@@ -15,5 +15,10 @@
  */
 package com.abc.test.mapper;
 
-public interface TestMatch {
+import com.abc.test.User;
+import org.apache.ibatis.annotations.Param;
+
+public interface UserMapper {
+
+  User getUser(@Param("username") String username, @Param("roleId") int roleId);
 }

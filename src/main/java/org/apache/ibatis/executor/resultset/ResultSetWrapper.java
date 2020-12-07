@@ -57,6 +57,7 @@ public class ResultSetWrapper {
     final ResultSetMetaData metaData = rs.getMetaData();
     final int columnCount = metaData.getColumnCount();
     for (int i = 1; i <= columnCount; i++) {
+      // 获取sql语句中列名
       columnNames.add(configuration.isUseColumnLabel() ? metaData.getColumnLabel(i) : metaData.getColumnName(i));
       jdbcTypes.add(JdbcType.forCode(metaData.getColumnType(i)));
       classNames.add(metaData.getColumnClassName(i));
@@ -148,6 +149,7 @@ public class ResultSetWrapper {
     List<String> mappedColumnNames = new ArrayList<>();
     List<String> unmappedColumnNames = new ArrayList<>();
     final String upperColumnPrefix = columnPrefix == null ? null : columnPrefix.toUpperCase(Locale.ENGLISH);
+    // 获取resultMap结果集映射中所有列名的集合(注意处理前缀)
     final Set<String> mappedColumns = prependPrefixes(resultMap.getMappedColumns(), upperColumnPrefix);
     for (String columnName : columnNames) {
       final String upperColumnName = columnName.toUpperCase(Locale.ENGLISH);
@@ -157,6 +159,7 @@ public class ResultSetWrapper {
         unmappedColumnNames.add(columnName);
       }
     }
+    // 保存所有指定了列名映射关系的列名
     mappedColumnNamesMap.put(getMapKey(resultMap, columnPrefix), mappedColumnNames);
     unMappedColumnNamesMap.put(getMapKey(resultMap, columnPrefix), unmappedColumnNames);
   }

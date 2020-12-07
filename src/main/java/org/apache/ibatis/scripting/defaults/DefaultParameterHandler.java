@@ -61,7 +61,7 @@ public class DefaultParameterHandler implements ParameterHandler {
   @Override
   public void setParameters(PreparedStatement ps) {
     ErrorContext.instance().activity("setting parameters").object(mappedStatement.getParameterMap().getId());
-    // 获取sql语句节点的入参集合
+    // 获取sql语句节点的入参映射对象集合
     List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
     if (parameterMappings != null) {
       for (int i = 0; i < parameterMappings.size(); i++) {
@@ -78,6 +78,7 @@ public class DefaultParameterHandler implements ParameterHandler {
             value = parameterObject;
           } else {
             MetaObject metaObject = configuration.newMetaObject(parameterObject);
+            // 获取入参的值
             value = metaObject.getValue(propertyName);
           }
           // 获取参数的类型解析器

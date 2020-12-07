@@ -83,7 +83,7 @@ public class MapperMethod {
         } else if (method.returnsCursor()) {    // 返回值为游标
           result = executeForCursor(sqlSession, args);
         } else {  // 处理返回为单一对象的情况
-          // 通过参数解析器解析参数,将入参转化成Map
+          // 通过参数名称解析器解析参数,将入参转化成Map
           Object param = method.convertArgsToSqlCommandParam(args);
           // 使用sqlSession执行sql语句
           result = sqlSession.selectOne(command.getName(), param);

@@ -401,13 +401,17 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     // 反射生成实体对象(mapper接口的返回值类型)
     Object rowValue = createResultObject(rsw, resultMap, lazyLoader, columnPrefix);
     if (rowValue != null && !hasTypeHandlerForResultObject(rsw, resultMap.getType())) {
+      // 对目标对象进行封装得到metaObjcect,为后续的赋值操作做好准备
       final MetaObject metaObject = configuration.newMetaObject(rowValue);
       boolean foundValues = this.useConstructorMappings;
-      if (shouldApplyAutomaticMappings(resultMap, false)) {
+      if (shouldApplyAutomaticMappings(resultMap, false)) {   // 是否使用自动映射
+        // 一般情况下autoMappingBehavior默认值为PARTIAL,对未明确指定映射规则的字段进行自动映射
         foundValues = applyAutomaticMappings(rsw, resultMap, metaObject, columnPrefix) || foundValues;
       }
+      // 映射resultMap中明确指定需要映射的列
       foundValues = applyPropertyMappings(rsw, resultMap, metaObject, lazyLoader, columnPrefix) || foundValues;
       foundValues = lazyLoader.size() > 0 || foundValues;
+      // 如果没有一个映射成功的属性,则根据<returnInstanceForEmptyRow>的配置返回null或者结果对象
       rowValue = foundValues || configuration.isReturnInstanceForEmptyRow() ? rowValue : null;
     }
     return rowValue;
@@ -474,6 +478,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     boolean foundValues = false;
     final List<ResultMapping> propertyMappings = resultMap.getPropertyResultMappings();
     for (ResultMapping propertyMapping : propertyMappings) {
+      // 获取sql语句中字段的列名,注意前缀的处理
       String column = prependPrefix(propertyMapping.getColumn(), columnPrefix);
       if (propertyMapping.getNestedResultMapId() != null) {
         // the user added a column attribute to a nested result map, ignore it
@@ -482,8 +487,9 @@ public class DefaultResultSetHandler implements ResultSetHandler {
       if (propertyMapping.isCompositeResult()
           || (column != null && mappedColumnNames.contains(column.toUpperCase(Locale.ENGLISH)))
           || propertyMapping.getResultSet() != null) {
+        // 通过列名从结果集中获取查询出来的值
         Object value = getPropertyMappingValue(rsw.getResultSet(), metaObject, propertyMapping, lazyLoader, columnPrefix);
-        // issue #541 make property optional
+        // 获取column(列名)对应实体对象的属性值(property)
         final String property = propertyMapping.getProperty();
         if (property == null) {
           continue;
@@ -518,14 +524,17 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     }
   }
 
+  // 获取resultSet中存在的,但是ResultMap中没有明确映射的列,填充至autoMapping中
   private List<UnMappedColumnAutoMapping> createAutomaticMappings(ResultSetWrapper rsw, ResultMap resultMap, MetaObject metaObject, String columnPrefix) throws SQLException {
     final String mapKey = resultMap.getId() + ":" + columnPrefix;
     List<UnMappedColumnAutoMapping> autoMapping = autoMappingsCache.get(mapKey);
     if (autoMapping == null) {
       autoMapping = new ArrayList<>();
+      // 获取未映射的列名
       final List<String> unmappedColumnNames = rsw.getUnmappedColumnNames(resultMap, columnPrefix);
       for (String columnName : unmappedColumnNames) {
         String propertyName = columnName;
+        // 前缀的处理,如果有前缀,属性名为列名去除前缀
         if (columnPrefix != null && !columnPrefix.isEmpty()) {
           // When columnPrefix is specified,
           // ignore columns without the prefix.
@@ -535,14 +544,20 @@ public class DefaultResultSetHandler implements ResultSetHandler {
             continue;
           }
         }
+        // 在结果对象中查找指定的属性名
         final String property = metaObject.findProperty(propertyName, configuration.isMapUnderscoreToCamelCase());
+        // 检查该属性是否有setter方法
         if (property != null && metaObject.hasSetter(property)) {
+          // 如果该属性名称在resultMap中已经指定,则忽略此属性
           if (resultMap.getMappedProperties().contains(property)) {
             continue;
           }
           final Class<?> propertyType = metaObject.getSetterType(property);
+          // 判断typeHandlerRegistry是否有匹配的typeHandler
           if (typeHandlerRegistry.hasTypeHandler(propertyType, rsw.getJdbcType(columnName))) {
+            // 找到类型转换器
             final TypeHandler<?> typeHandler = rsw.getTypeHandler(propertyType, columnName);
+            // 创建UnMappedColumnAutoMapping,并填充至autoMapping
             autoMapping.add(new UnMappedColumnAutoMapping(columnName, property, typeHandler, propertyType.isPrimitive()));
           } else {
             configuration.getAutoMappingUnknownColumnBehavior()
@@ -558,17 +573,21 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     return autoMapping;
   }
 
+  // 对未明确指定映射规则的字段进行自动映射
   private boolean applyAutomaticMappings(ResultSetWrapper rsw, ResultMap resultMap, MetaObject metaObject, String columnPrefix) throws SQLException {
+    // 获取resultSet中存在的,但是ResultMap中没有明确映射的列,填充至autoMapping中
     List<UnMappedColumnAutoMapping> autoMapping = createAutomaticMappings(rsw, resultMap, metaObject, columnPrefix);
     boolean foundValues = false;
     if (!autoMapping.isEmpty()) {
+      // 遍历autoMapping,通过自动匹配的方式为实体对象的属性复制
       for (UnMappedColumnAutoMapping mapping : autoMapping) {
+        // 通过typeHandler从resultset中拿值
         final Object value = mapping.typeHandler.getResult(rsw.getResultSet(), mapping.column);
         if (value != null) {
           foundValues = true;
         }
         if (value != null || (configuration.isCallSettersOnNulls() && !mapping.primitive)) {
-          // gcode issue #377, call setter on nulls (value is not 'found')
+          // 通过metaObject给属性赋值
           metaObject.setValue(mapping.property, value);
         }
       }
@@ -633,6 +652,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     this.useConstructorMappings = false; // reset previous mapping result
     final List<Class<?>> constructorArgTypes = new ArrayList<>();
     final List<Object> constructorArgs = new ArrayList<>();
+    // 反射方式生成指定的实体对象
     Object resultObject = createResultObject(rsw, resultMap, constructorArgTypes, constructorArgs, columnPrefix);
     if (resultObject != null && !hasTypeHandlerForResultObject(rsw, resultMap.getType())) {
       final List<ResultMapping> propertyMappings = resultMap.getPropertyResultMappings();

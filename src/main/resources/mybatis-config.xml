@@ -25,7 +25,7 @@
     <!-- <setting name="aggressiveLazyLoading" value="false"/> -->
   </settings>
   <typeAliases>
-    <typeAlias alias="role" type="com.abc.test.Role"/>
+    <package name="com.abc.test"/>
   </typeAliases>
   <typeHandlers>
     <typeHandler jdbcType="VARCHAR" javaType="string" handler="com.abc.test.handler.CustomStringHandler"/>

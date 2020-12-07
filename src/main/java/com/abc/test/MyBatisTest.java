@@ -16,6 +16,7 @@
 package com.abc.test;
 
 import com.abc.test.mapper.RoleMapper;
+import com.abc.test.mapper.UserMapper;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -41,9 +42,12 @@ public class MyBatisTest {
       // sqlSession中包含了Executor(持有Configuration对象和Transaction对象)
       sqlSession=sqlSessionFactory.openSession();
       // 动态代理生成的对象，内部会持有sqlSession的引用
-      RoleMapper roleMapper=sqlSession.getMapper(RoleMapper.class);
-      Role role=roleMapper.getRole(1L);
-      System.out.println(role.getId()+":"+role.getRoleName()+":"+role.getNote());
+      //RoleMapper roleMapper=sqlSession.getMapper(RoleMapper.class);
+      //Role role=roleMapper.getRole(1L);
+      //System.out.println(role.getId()+":"+role.getRoleName()+":"+role.getNote());
+      UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+      User user = userMapper.getUser("张三", 1);
+      System.out.println(user.toString());
       sqlSession.commit();
 
     } catch (Exception e) {
