@@ -159,8 +159,9 @@ public class ResultSetWrapper {
         unmappedColumnNames.add(columnName);
       }
     }
-    // 保存所有指定了列名映射关系的列名
+    // 保存所有指定了映射关系的列名
     mappedColumnNamesMap.put(getMapKey(resultMap, columnPrefix), mappedColumnNames);
+    // 保存所有未指定映射关系的列名
     unMappedColumnNamesMap.put(getMapKey(resultMap, columnPrefix), unmappedColumnNames);
   }
 

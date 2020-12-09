@@ -33,7 +33,7 @@ public class CustomStringHandler implements TypeHandler<String> {
 
   @Override
   public String getResult(ResultSet rs, String colName) throws SQLException {
-    log.info("使用我的TypeHandler,ResultSet列名获取字符串");
+    log.info("使用我的TypeHandler,ResultSet列名获取字符串:"+colName);
     return rs.getString(colName);
   }
 

@@ -14,6 +14,17 @@ public class User {
 
   private Date loginTime;
 
+  @Override
+  public String toString() {
+    return "User{" +
+      "userId=" + userId +
+      ", role=" + role +
+      ", username='" + username + '\'' +
+      ", sex='" + sex + '\'' +
+      ", loginTime=" + loginTime +
+      '}';
+  }
+
   public int getUserId() {
     return userId;
   }

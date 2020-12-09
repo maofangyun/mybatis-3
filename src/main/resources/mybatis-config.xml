@@ -30,6 +30,12 @@
   <typeHandlers>
     <typeHandler jdbcType="VARCHAR" javaType="string" handler="com.abc.test.handler.CustomStringHandler"/>
   </typeHandlers>
+  <!--插件-->
+  <plugins>
+    <plugin interceptor="com.abc.test.plugin.ThresholdInterceptor">
+      <property name="threshold" value="10"/>
+    </plugin>
+  </plugins>
   <!-- 定义数据库的信息，默认使用development数据库构建环境 -->
   <environments default="development">
     <environment id="development">
