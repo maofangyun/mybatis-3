@@ -198,9 +198,11 @@ public class XMLConfigBuilder extends BaseBuilder {
     if (parent != null) {
       for (XNode child : parent.getChildren()) {
         String interceptor = child.getStringAttribute("interceptor");
+        // 获取<property/>节点的信息,即拦截器对象的属性值
         Properties properties = child.getChildrenAsProperties();
         Interceptor interceptorInstance = (Interceptor) resolveClass(interceptor).getDeclaredConstructor().newInstance();
         interceptorInstance.setProperties(properties);
+        // 将拦截器注册到configuration中
         configuration.addInterceptor(interceptorInstance);
       }
     }

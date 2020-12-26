@@ -35,7 +35,7 @@ public class MyBatisTest {
       e.printStackTrace();
     }
     SqlSessionFactory sqlSessionFactory=null;
-    // SqlSessionFactory里面包含了Configuration(存储了mybatis-config.xml中配置的各种属性值)
+    // SqlSessionFactory里面包含了Configuration(存储了mybatis-config.xml中配置的各种属性值和mapper.xml解析后的所有信息)
     sqlSessionFactory=new SqlSessionFactoryBuilder().build(inputStream);
     SqlSession sqlSession=null;
     try {
