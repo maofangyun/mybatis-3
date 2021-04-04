@@ -33,7 +33,7 @@
   <!--插件-->
   <plugins>
     <plugin interceptor="com.abc.test.plugin.ThresholdInterceptor">
-      <property name="threshold" value="10"/>
+      <property name="threshold" value="10000"/>
     </plugin>
     <plugin interceptor="com.abc.test.plugin.PageInterceptor"/>
   </plugins>

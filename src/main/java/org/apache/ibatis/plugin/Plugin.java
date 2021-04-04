@@ -43,6 +43,7 @@ public class Plugin implements InvocationHandler {
   public static Object wrap(Object target, Interceptor interceptor) {
     Map<Class<?>, Set<Method>> signatureMap = getSignatureMap(interceptor);
     Class<?> type = target.getClass();
+    // 和signatureMap中的type进行匹配,然后返回type(通常只能匹配成功一个)
     Class<?>[] interfaces = getAllInterfaces(type, signatureMap);
     if (interfaces.length > 0) {
       return Proxy.newProxyInstance(
@@ -58,6 +59,7 @@ public class Plugin implements InvocationHandler {
     try {
       Set<Method> methods = signatureMap.get(method.getDeclaringClass());
       if (methods != null && methods.contains(method)) {
+        // 调用拦截器的拦截方法
         return interceptor.intercept(new Invocation(target, method, args));
       }
       return method.invoke(target, args);
@@ -74,6 +76,8 @@ public class Plugin implements InvocationHandler {
     }
     Signature[] sigs = interceptsAnnotation.value();
     Map<Class<?>, Set<Method>> signatureMap = new HashMap<>();
+    // 按照Executor.class,ParameterHandler.class,ResultSetHandler.class和StatementHandler.class这四种类型来构建拦截插件
+    // signatureMap的key,类型也只能是这四种
     for (Signature sig : sigs) {
       Set<Method> methods = signatureMap.computeIfAbsent(sig.type(), k -> new HashSet<>());
       try {

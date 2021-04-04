@@ -21,8 +21,8 @@ import org.apache.ibatis.session.RowBounds;
 
 
 @Intercepts({
-	@Signature(type=StatementHandler.class,method="query",args={Statement.class, ResultHandler.class})
-//	@Signature(type=StatementHandler.class,method="query",args={MappedStatement.class,Object.class, RowBounds.class, ResultHandler.class})
+	//@Signature(type=StatementHandler.class,method="query",args={Statement.class, ResultHandler.class}),
+	@Signature(type=Executor.class,method="query",args={MappedStatement.class,Object.class, RowBounds.class, ResultHandler.class})
 })
 
 public class ThresholdInterceptor implements Interceptor {
