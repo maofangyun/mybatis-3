@@ -35,6 +35,7 @@
     <plugin interceptor="com.abc.test.plugin.ThresholdInterceptor">
       <property name="threshold" value="10"/>
     </plugin>
+    <plugin interceptor="com.abc.test.plugin.PageInterceptor"/>
   </plugins>
   <!-- 定义数据库的信息，默认使用development数据库构建环境 -->
   <environments default="development">
@@ -42,9 +43,9 @@
       <transactionManager type="JDBC"/>
       <dataSource type="POOLED">
         <property name="driver" value="com.mysql.cj.jdbc.Driver"/>
-        <property name="url" value="jdbc:mysql://47.96.126.175:3306/localtest"/>
+        <property name="url" value="jdbc:mysql://47.92.1.153:3307/detection"/>
         <property name="username" value="root"/>
-        <property name="password" value="#lzdong#p"/>
+        <property name="password" value="123456"/>
       </dataSource>
     </environment>
   </environments>

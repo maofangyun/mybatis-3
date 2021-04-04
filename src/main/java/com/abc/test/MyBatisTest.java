@@ -17,6 +17,7 @@ package com.abc.test;
 
 import com.abc.test.mapper.RoleMapper;
 import com.abc.test.mapper.UserMapper;
+import com.abc.test.plugin.PageUtil;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -46,6 +47,7 @@ public class MyBatisTest {
       //Role role=roleMapper.getRole(1L);
       //System.out.println(role.getId()+":"+role.getRoleName()+":"+role.getNote());
       UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+      PageUtil.enable(1,1);
       User user = userMapper.getUser("张三", 1);
       System.out.println(user.toString());
       sqlSession.commit();

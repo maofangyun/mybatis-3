@@ -16,7 +16,7 @@
       role_name,
       note
     FROM
-      role
+      m_role
     WHERE
       role_id = #{id}
   </select>
@@ -26,16 +26,16 @@
       role_id,
       role_name,
       note
-    from role
+    from m_role
     where
     role_name like CONCAT('%',#{roleName javaType=string,jdbcType=VARCHAR,typeHandler=com.abc.test.handler.CustomStringHandler},'%')
   </select>
 
   <insert id="insertRole" parameterType="role">
-    insert into role(role_name,note) value(#{roleName},#{note})
+    insert into m_role(role_name,note) value(#{roleName},#{note})
   </insert>
 
   <delete id="deleteRole" parameterType="long">
-    delete from role where id=#{id}
+    delete from m_role where id=#{id}
   </delete>
 </mapper>

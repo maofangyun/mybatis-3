@@ -23,7 +23,7 @@
       u.login_time
     FROM
         user u
-        INNER JOIN role r ON r.role_id = u.role_id
+        INNER JOIN m_role r ON r.role_id = u.role_id
     WHERE
         u.username = #{username} AND r.role_id = #{roleId}
   </select>
